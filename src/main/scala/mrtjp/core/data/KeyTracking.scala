@@ -16,14 +16,15 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.player.EntityPlayer
 
+import java.util.UUID
 import scala.collection.mutable.{HashMap => MHashMap, Map => MMap}
 
 object KeyTracking {
   private var idPool = 0
-  private val map = MHashMap[Int, MMap[EntityPlayer, Boolean]]()
+  private val map = MHashMap[Int, MMap[UUID, Boolean]]()
 
   def updatePlayerKey(id: Int, player: EntityPlayer, state: Boolean) {
-    map(id) += player -> state
+    map(id) += player.getGameProfile.getId -> state
   }
 
   def registerTracker(tracker: TServerKeyTracker) {
@@ -31,11 +32,12 @@ object KeyTracking {
     idPool += 1
     map.getOrElseUpdate(
       tracker.id,
-      MHashMap[EntityPlayer, Boolean]().withDefaultValue(false)
+      MHashMap[UUID, Boolean]().withDefaultValue(false)
     )
   }
 
-  def isKeyDown(id: Int, player: EntityPlayer) = map(id)(player)
+  def isKeyDown(id: Int, player: EntityPlayer) =
+    map(id)(player.getGameProfile.getId)
 }
 
 trait TServerKeyTracker {
