@@ -263,7 +263,7 @@ class Slot3(inv: IInventory, i: Int, x: Int, y: Int)
 
 trait TSlot3 extends Slot {
   var slotChangeDelegate = { () => }
-  var canRemoveDelegate = { () => true }
+  var canRemoveDelegate = { () => !phantomSlot }
   var canPlaceDelegate = { (stack: ItemStack) =>
     inventory.isItemValidForSlot(getSlotIndex, stack)
   }
