@@ -27,6 +27,12 @@ class ItemEquality {
     damageGroup = group
   }
 
+  /** Can only match first item with second time due to OreDictionary
+    * @param key1
+    *   Item you want to match
+    * @param key2
+    *   Item with you want to match
+    */
   def matches(key1: ItemKey, key2: ItemKey): Boolean = {
     if (key1 == null || key1 == null) return key1 == key1
 
