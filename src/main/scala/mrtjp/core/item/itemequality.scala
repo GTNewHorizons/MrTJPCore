@@ -12,21 +12,27 @@ class ItemEquality {
   var matchNBT = true
   var matchOre = false
 
-  var damageGroup = -1
+  var damageGroup: Int = -1
 
-  def apply(key: ItemKey) = {
+  def apply(key: ItemKey): AppliedItemEquality = {
     val c = new AppliedItemEquality(key)
     c.setFlags(matchMeta, matchNBT, matchOre, damageGroup)
     c
   }
 
-  def setFlags(meta: Boolean, nbt: Boolean, ore: Boolean, group: Int) {
+  def setFlags(meta: Boolean, nbt: Boolean, ore: Boolean, group: Int): Unit = {
     matchMeta = meta
     matchNBT = nbt
     matchOre = ore
     damageGroup = group
   }
 
+  /** Can only match first item with second time due to OreDictionary
+    * @param key1
+    *   Item you want to match
+    * @param key2
+    *   Item with you want to match
+    */
   def matches(key1: ItemKey, key2: ItemKey): Boolean = {
     if (key1 == null || key1 == null) return key1 == key1
 
@@ -34,9 +40,9 @@ class ItemEquality {
     val stack2 = key2.makeStack(0)
 
     if (matchOre) {
-      val a = OreDictionary.getOreIDs(stack1)
-      val b = OreDictionary.getOreIDs(stack2)
-      if (a.exists(b.contains)) return true
+      val ids1 = OreDictionary.getOreIDs(stack1)
+      val ids2 = OreDictionary.getOreIDs(stack2)
+      if (ids1.forall(id1 => ids2.contains(id1))) return true
     }
 
     if (key1.item == key2.item) {
