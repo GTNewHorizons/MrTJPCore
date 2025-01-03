@@ -42,7 +42,7 @@ trait TCubeMapRender extends TInstancedBlockRender {
     val (s, rot, icon) = getData(w, x, y, z)
     TextureUtils.bindAtlas(0)
     val state = CCRenderState.instance
-    state.reset()
+    state.resetInstance()
     state.lightMatrix.locate(w, x, y, z)
     models(s)(rot).render(
       new Translation(x, y, z),
@@ -60,8 +60,8 @@ trait TCubeMapRender extends TInstancedBlockRender {
   ) {
     val b = w.getBlock(x, y, z)
     val state = CCRenderState.instance
-    state.reset()
-    state.setPipeline(
+    state.resetInstance()
+    state.setPipelineInstance(
       new Translation(x, y, z),
       new IconTransformation(icon)
     )
@@ -83,12 +83,12 @@ trait TCubeMapRender extends TInstancedBlockRender {
 
     TextureUtils.bindAtlas(0)
     val state = CCRenderState.instance
-    state.reset()
-    state.setDynamic()
-    state.pullLightmap()
-    state.startDrawing()
+    state.resetInstance()
+    state.setDynamicInstance()
+    state.pullLightmapInstance()
+    state.startDrawingInstance()
     models(s)(r).render(invTranslation, icon)
-    state.draw()
+    state.drawInstance()
   }
 
   def getData(
