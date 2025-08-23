@@ -40,7 +40,6 @@ trait TCubeMapRender extends TInstancedBlockRender {
       meta: Int
   ) {
     val (s, rot, icon) = getData(w, x, y, z)
-    TextureUtils.bindAtlas(0)
     val state = CCRenderState.instance
     state.resetInstance()
     state.lightMatrix.locate(w, x, y, z)
