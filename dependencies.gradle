@@ -36,5 +36,5 @@
 dependencies {
     implementation('com.github.GTNewHorizons:CodeChickenCore:1.4.7:dev')
 
-    runtimeOnly('com.github.GTNewHorizons:ProjectRed:4.12.28-GTNH:dev')
+    runtimeOnlyNonPublishable('com.github.GTNewHorizons:ProjectRed:4.12.28-GTNH:dev')
 }
