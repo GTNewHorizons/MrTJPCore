@@ -59,7 +59,9 @@ object BlockUpdateHandler {
 
   @SubscribeEvent
   def onTick(event: WorldTickEvent) {
-    if (event.side != Side.SERVER || event.phase != Phase.END || handlers.length == 0) return
+    if (
+      event.side != Side.SERVER || event.phase != Phase.END || handlers.length == 0
+    ) return
 
     // Reproduces same algorithm used for random block updates
     val world = event.world.asInstanceOf[WorldServer]
