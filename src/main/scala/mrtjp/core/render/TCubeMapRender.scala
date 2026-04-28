@@ -48,6 +48,7 @@ trait TCubeMapRender extends TInstancedBlockRender {
       icon,
       state.lightMatrix
     )
+    state.lightMatrix.access = null
   }
 
   override def renderBreaking(
