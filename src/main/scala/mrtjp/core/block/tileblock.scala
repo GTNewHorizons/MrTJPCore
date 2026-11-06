@@ -631,9 +631,22 @@ abstract class InstancedBlockTile extends TileEntity with ICustomPacketTile {
 
   final def handleDescriptionPacket(packet: PacketCustom) =
     packet.readUByte() match {
-      case 0   => readDesc(packet)
-      case key => read(packet, key)
+      case 0 if !world.isRemote => // Never apply client description packets.
+      case 0                    => readDesc(packet)
+      case key                  => read(packet, key)
     }
+
+  final def handleClientPacket(packet: PacketCustom, player: EntityPlayer) =
+    packet.readUByte() match {
+      case 0   =>
+      case key => readFromClient(packet, key, player)
+    }
+
+  /** Server-bound GUI actions must opt in here and validate their payload and
+    * player. Description and client-bound update keys must remain in readDesc
+    * and read; unapproved client keys are ignored by default.
+    */
+  def readFromClient(in: MCDataInput, key: Int, player: EntityPlayer) {}
 
   def read(in: MCDataInput, key: Int) {}
 
