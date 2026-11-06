@@ -14,7 +14,7 @@ import codechicken.lib.vec.{BlockCoord, Cuboid6, Rotation, Vector3}
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler
 import cpw.mods.fml.common.registry.GameRegistry
 import cpw.mods.fml.relauncher.{Side, SideOnly}
-import mrtjp.core.handler.MrTJPCoreSPH
+import mrtjp.core.handler.{MrTJPCoreMod, MrTJPCoreSPH}
 import mrtjp.core.world.WorldLib
 import net.minecraft.block.material.Material
 import net.minecraft.block.{Block, BlockContainer}
@@ -33,6 +33,7 @@ import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
+import scala.util.control.NonFatal
 
 object TileRenderRegistry extends ISimpleBlockRenderingHandler {
   var renderID = -1
@@ -631,9 +632,40 @@ abstract class InstancedBlockTile extends TileEntity with ICustomPacketTile {
 
   final def handleDescriptionPacket(packet: PacketCustom) =
     packet.readUByte() match {
-      case 0   => readDesc(packet)
-      case key => read(packet, key)
+      case 0 if !world.isRemote => // Never apply client description packets.
+      case 0                    => readDesc(packet)
+      case key                  => read(packet, key)
     }
+
+  final def handleClientPacket(packet: PacketCustom, player: EntityPlayer) =
+    packet.readUByte() match {
+      case 0 =>
+        val details =
+          try clientDescriptionPacketDetails(packet)
+          catch {
+            case NonFatal(_) =>
+              "item=unknown, quantity=unknown (malformed payload)"
+          }
+        MrTJPCoreMod.log.warn(
+          MrTJPCoreMod.securityMarker,
+          s"Rejected client tile description from ${player.getGameProfile} " +
+            s"at dimension=${world.provider.dimensionId}, coords=($x,$y,$z), " +
+            s"tile=${getClass.getName}, $details"
+        )
+      case key => readFromClient(packet, key, player)
+    }
+
+  /** Diagnostic fields from a rejected description; must not apply its state or
+    * decode untrusted NBT. The packet is never dispatched after this hook.
+    */
+  protected def clientDescriptionPacketDetails(packet: PacketCustom): String =
+    "item=unknown, quantity=unknown"
+
+  /** Server-bound GUI actions must opt in here and validate their payload and
+    * player. Description and client-bound update keys must remain in readDesc
+    * and read; unapproved client keys are ignored by default.
+    */
+  def readFromClient(in: MCDataInput, key: Int, player: EntityPlayer) {}
 
   def read(in: MCDataInput, key: Int) {}
 

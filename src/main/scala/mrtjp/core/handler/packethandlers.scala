@@ -11,6 +11,7 @@ import codechicken.lib.packet.PacketCustom.{
 }
 import codechicken.lib.packet.{ICustomPacketTile, PacketCustom}
 import codechicken.lib.vec.BlockCoord
+import mrtjp.core.block.InstancedBlockTile
 import mrtjp.core.data.KeyTracking
 import mrtjp.core.gui.GuiHandler
 import mrtjp.core.world.{Messenger, WorldLib}
@@ -62,11 +63,13 @@ object MrTJPCoreSPH extends MrTJPCorePH with IServerPacketHandler {
   ) {
     packet.getType match {
       case this.tilePacket =>
-        handleTilePacket(
-          sender.theItemInWorldManager.theWorld,
-          packet,
-          packet.readCoord()
-        )
+        val pos = packet.readCoord()
+        val w = sender.theItemInWorldManager.theWorld
+        if (!w.blockExists(pos.x, pos.y, pos.z)) return
+        if (sender.getDistanceSq(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5) > 64)
+          return
+        val t = WorldLib.getTileEntity(w, pos, classOf[InstancedBlockTile])
+        if (t != null) t.handleClientPacket(packet, sender)
       case this.keyBindPacket =>
         KeyTracking.updatePlayerKey(
           packet.readUByte(),
