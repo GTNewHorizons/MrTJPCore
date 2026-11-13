@@ -5,12 +5,14 @@
  */
 package mrtjp.core.block
 
-import java.util.{ArrayList => JArrayList, List => JList, Random}
+import java.util.{ArrayList => JArrayList, List => JList, Random, UUID}
+import java.util.concurrent.TimeUnit
 
 import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import codechicken.lib.packet.{ICustomPacketTile, PacketCustom}
 import codechicken.lib.render.TextureUtils
 import codechicken.lib.vec.{BlockCoord, Cuboid6, Rotation, Vector3}
+import com.google.common.cache.CacheBuilder
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler
 import cpw.mods.fml.common.registry.GameRegistry
 import cpw.mods.fml.relauncher.{Side, SideOnly}
@@ -500,6 +502,15 @@ trait TTileOrient extends InstancedBlockTile {
   def absoluteRot(absDir: Int) = Rotation.rotationTo(side, absDir)
 }
 
+object InstancedBlockTile {
+  // Share the cooldown across tiles and reconnects, without retaining players.
+  private val clientDescriptionWarnings = CacheBuilder
+    .newBuilder()
+    .maximumSize(10000)
+    .expireAfterWrite(1, TimeUnit.MINUTES)
+    .build[UUID, java.lang.Boolean]()
+}
+
 abstract class InstancedBlockTile extends TileEntity with ICustomPacketTile {
   protected var schedTick = -1L
 
@@ -639,6 +650,11 @@ abstract class InstancedBlockTile extends TileEntity with ICustomPacketTile {
 
   final def handleClientPacket(packet: PacketCustom, player: EntityPlayer) =
     packet.readUByte() match {
+      case 0
+          if InstancedBlockTile.clientDescriptionWarnings
+            .asMap()
+            .putIfAbsent(player.getUniqueID, true) != null =>
+      // Reject repeated descriptions without parsing diagnostics or logging.
       case 0 =>
         val details =
           try clientDescriptionPacketDetails(packet)

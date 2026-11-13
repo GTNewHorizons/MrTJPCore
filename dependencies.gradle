@@ -36,5 +36,7 @@
 dependencies {
     implementation('com.github.GTNewHorizons:CodeChickenCore:1.4.12:dev')
 
+    testImplementation('junit:junit:4.13.2')
+
     runtimeOnlyNonPublishable('com.github.GTNewHorizons:ProjectRed:4.12.33-GTNH:dev')
 }
