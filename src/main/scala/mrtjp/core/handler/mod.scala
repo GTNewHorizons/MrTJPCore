@@ -13,7 +13,7 @@ import cpw.mods.fml.common.event.{
 }
 import mrtjp.core.data.{ModConfig, SpecialConfigGui, TModGuiFactory}
 import net.minecraft.client.gui.GuiScreen
-import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.{LogManager, MarkerManager}
 
 @Mod(
   modid = "MrTJPCoreMod",
@@ -22,13 +22,14 @@ import org.apache.logging.log4j.LogManager
   guiFactory = "mrtjp.core.handler.GuiConfigFactory",
   acceptedMinecraftVersions = "[1.7.10]",
   name = "MrTJPCore",
-  dependencies = "required-after:CodeChickenCore@[1.4.3,)",
+  dependencies = "required-after:CodeChickenCore@[1.5.1,)",
   version = MrTJPCoreMod.version
 )
 object MrTJPCoreMod {
   final val version = "GRADLETOKEN_VERSION"
 
   val log = LogManager.getFormatterLogger("MrTJPCoreMod")
+  val securityMarker = MarkerManager.getMarker("SuspiciousPackets")
 
   @Mod.EventHandler
   def preInit(event: FMLPreInitializationEvent) {
