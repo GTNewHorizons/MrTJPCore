@@ -22,7 +22,7 @@ import org.apache.logging.log4j.{LogManager, MarkerManager}
   guiFactory = "mrtjp.core.handler.GuiConfigFactory",
   acceptedMinecraftVersions = "[1.7.10]",
   name = "MrTJPCore",
-  dependencies = "required-after:CodeChickenCore@[1.5.1,)",
+  dependencies = "required-after:CodeChickenCore@[1.4.24,)",
   version = MrTJPCoreMod.version
 )
 object MrTJPCoreMod {
